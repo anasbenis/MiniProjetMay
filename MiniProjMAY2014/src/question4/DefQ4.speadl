@@ -1,0 +1,35 @@
+import question2.AnnounceInit
+import question4.Init
+import question4.InitRequest
+import compDefQ4.InitProcess
+
+namespace compDefQ4 {
+	component InitProcess {
+		provides doInit : Init
+		requires doAnnounce : AnnounceInit
+		requires initReq : InitRequest
+	}
+}
+
+
+// Q4
+namespace compClientDefQ4 {
+	component InitProcessFollower{
+		provides doInitFollower : Init
+		requires getInit : Init
+		
+	}
+	component InitProcessInclude{
+		provides doInitInclude : Init = initPFollower.doInitFollower
+		requires doAnnounceInclude : AnnounceInit
+		requires initReqInclude : InitRequest
+		
+		part initP : InitProcess{
+			bind doAnnounce to doAnnounceInclude
+			bind initReq to initReqInclude
+		}
+		part  initPFollower : InitProcessFollower{
+			bind getInit to initP.doInit
+		}
+	}
+}

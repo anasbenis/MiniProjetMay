@@ -1,0 +1,38 @@
+import question3.Eval
+import question2.PrintingRequest
+import question3.ValidateRequest
+import question3.EvalRequest
+import compDefQ2.Print
+import compDefQ3.StartEval
+import compDefQ3.ValidateComp
+
+
+namespace compDefQ3 {
+	component StartEval {
+		provides evaluate : Eval
+		requires printService : PrintingRequest
+		requires validateService : ValidateRequest
+	}
+	component ValidateComp {
+		provides validReq : ValidateRequest
+		requires evReq : EvalRequest
+	}
+}
+
+//////////////////////////////////Q3 
+namespace compClientDefQ3 {
+	component CompositeQ3 {
+		provides eval : Eval = startEv.evaluate
+		requires idEval : EvalRequest
+		
+		part pr : Print
+		part startEv : StartEval{
+			bind printService to pr.pReq
+			bind validateService to validate.validReq
+		}
+		part validate : ValidateComp{
+			bind evReq to idEval
+		}
+		
+	}
+}

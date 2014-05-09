@@ -1,0 +1,67 @@
+import question5.ComputableEval
+import question5.StorableEval
+import question3.EvalRequest
+import question4.InitRequest
+import question1.Identifiable
+import question4.Init
+import compDefQ2.CompositeQ2
+import compClientDefQ4.InitProcessInclude
+import question3.Eval
+import compClientDefQ3.CompositeQ3
+import compDefQ5.IdEvalThenStore
+import compDefQ5.StoreEval
+import compDefQ5.ComputeEval
+import compDefQ1.Identification
+
+namespace compDefQ5 {
+	component ComputeEval {
+		provides evalService : ComputableEval
+	}
+	component StoreEval {
+		provides storeService : StorableEval
+	}
+	component IdEvalThenStore {
+		provides evalReq : EvalRequest
+		provides initReq : InitRequest
+		requires idReq : Identifiable
+		requires compReq : ComputableEval
+		requires stoReq : StorableEval
+	}
+
+}
+
+/////////////Q5
+namespace compClientDefQ5{
+	component CompositeInitServise{
+		provides init : Init = initProcess.doInitInclude
+		requires initReq : InitRequest
+		part cmp : CompositeQ2{
+			
+		}
+		part initProcess : InitProcessInclude{
+			bind doAnnounceInclude to cmp.announceService
+			bind initReqInclude to initReq
+		}
+	}
+	
+	component Root {
+		provides init : Init = composite1.init
+		provides eval : Eval = composite2.eval
+		
+		part composite1 : CompositeInitServise{
+			bind initReq to idEvalThenStore.initReq
+		}
+		part composite2 : CompositeQ3{
+			bind idEval to idEvalThenStore.evalReq
+		}
+		part idEvalThenStore : IdEvalThenStore{
+			bind idReq to ident.getID
+			bind compReq to cmpEval.evalService
+			bind stoReq to strEval.storeService
+		}
+		part strEval : StoreEval
+		part cmpEval : ComputeEval
+		part ident : Identification
+	}
+
+}
